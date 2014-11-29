@@ -1,16 +1,48 @@
 package javafunctiontester;
+
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javafunctiontester.gui.main.MainWindowController;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
-public class Program {
 
+public class Program extends Application {
+	
 	public static void main(String[] args) {
+		runProgramGUI(args);
+	}
+	
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		try {
+			FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource("MainWindow.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+	        Scene scene = new Scene(page);
+	        
+	        MainWindowController controller = loader.getController();
+	        controller.setParent(page);
+	        
+	        primaryStage.setScene(scene);
+	        primaryStage.setTitle("Java Function Tester v1.0");
+	        primaryStage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void runProgramGUI(String[] args) {
+		launch(args);
+	}
+	
+	public static void runProgram(String[] args) {
 		List<AnswerKey> answerKeys = new ArrayList<AnswerKey>();
 		
 		String filepath;
@@ -45,10 +77,6 @@ public class Program {
 		);
 		
 		answerKeys.add(answerKey);
-		/*
-		for(Class<?> classType : answerKey.getArgumentClassTypes())
-			System.out.println(classType);
-		*/
 		
 		File javaFile = new File(filepath);
 		List<File> javaFiles = new ArrayList<File>();
@@ -64,20 +92,4 @@ public class Program {
 		
 		scanner.nextLine();
 	}
-	
-	/*
-	public static Class<?> loadClass(File file) {
-		Class<?> clazz = null;
-		try {
-			URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{file.getParentFile().toURI().toURL()});
-			clazz = Class.forName("MyProgram", true, classLoader);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return clazz;
-	}
-	*/
 }

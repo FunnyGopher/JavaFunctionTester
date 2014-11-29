@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafunctiontester.gui.main.MainWindowController">
    <children>
       <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="600.0">
         <menus>
@@ -15,8 +14,8 @@
             <items>
                   <Menu mnemonicParsing="false" text="Import">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Answer Keys" />
-                        <MenuItem mnemonicParsing="false" text="Java Files" />
+                        <MenuItem mnemonicParsing="false" onAction="#openAnswerKeyChooser" text="Answer Keys" />
+                        <MenuItem mnemonicParsing="false" onAction="#openJavaFileChooser" text="Java Files" />
                     </items>
                   </Menu>
               <MenuItem mnemonicParsing="false" text="Close" />
@@ -43,5 +42,6 @@
           </Menu>
         </menus>
       </MenuBar>
+      <ListView layoutX="14.0" layoutY="83.0" prefHeight="200.0" prefWidth="200.0" />
    </children>
 </AnchorPane>
