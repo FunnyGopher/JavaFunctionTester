@@ -1,4 +1,4 @@
-package test;
+package javafunctiontester;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -16,18 +16,18 @@ public class Grader {
 	
 	private List<File> filesToGrade;
 	private List<AnswerKey> answerKeys;
-	private List<Boolean> results;
+	private List<Result> results;
 	
 	public Grader(List<File> filesToGrade, List<AnswerKey> answerKeys) {
 		this.filesToGrade = filesToGrade;
 		this.answerKeys = answerKeys;
-		results = new ArrayList<Boolean>();
+		results = new ArrayList<Result>();
 	}
 	
 	public void grade() {
 		for(File file : filesToGrade) {
 			for(AnswerKey key : answerKeys) {
-				boolean result = false;
+				Result result = new Result(false, key.getName());
 				
 				try {
 					compileAFile(file);
@@ -38,31 +38,38 @@ public class Grader {
 					Object output = method.invoke(obj, key.getArguementValues());
 					
 					if(key.getExpectedOutput().getValue().equals(output)) {
-						result = true;
+						result.setPass(true);
 					} else {
-						result = false;
+						result.setReason("The expected outcome did not match the actual result, Expected Outcome: " + key.getExpectedOutput().getValue() + ", Actual Result: " + output);
 					}
 					
 				} catch (MalformedURLException | ClassNotFoundException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				} catch (NoSuchMethodException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				} catch (SecurityException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				} catch (InstantiationException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
-					result = false;
+					result.setPass(false);
+					result.setReason(e.getMessage());
 					e.printStackTrace();
 				}
 				
@@ -74,7 +81,8 @@ public class Grader {
 	private Class<?> loadClass(File file) throws MalformedURLException, ClassNotFoundException {
 		Class<?> clazz = null;
 		URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{file.getParentFile().toURI().toURL()});
-		clazz = Class.forName(file.getName().substring(0, file.getName().length() - 5), true, classLoader);
+		String fileName = file.getName().substring(0, file.getName().length() - 5);
+		clazz = Class.forName(fileName, true, classLoader);
 		
 		return clazz;
 	}
@@ -85,7 +93,7 @@ public class Grader {
 		return success;
 	}
 	
-	public List<Boolean> getResults() {
+	public List<Result> getResults() {
 		return results;
 	}
 }

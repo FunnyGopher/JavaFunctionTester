@@ -1,4 +1,4 @@
-package test;
+package javafunctiontester;
 
 
 public class AnswerKey {

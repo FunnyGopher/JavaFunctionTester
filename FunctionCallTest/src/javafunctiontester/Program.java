@@ -1,4 +1,4 @@
-package test;
+package javafunctiontester;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +34,7 @@ public class Program {
 		expected = scanner.nextInt();
 		
 		AnswerKey answerKey = new AnswerKey(
-				"Test",
+				"Add Function Test",
 				"add",
 				new Data<Integer>(int.class, expected),
 				new Data<?>[] {
@@ -56,15 +56,16 @@ public class Program {
 		
 		Grader grader = new Grader(javaFiles, answerKeys);
 		grader.grade();
-		List<Boolean> results = grader.getResults();
+		List<Result> results = grader.getResults();
 		
-		for(Boolean bool : results)
-			System.out.println("Result: " + bool);
+		for(Result result : results)
+			System.out.println("[ Pass: " + result.didPass() + ", Test Name: " + result.getAnswerKeyName() + ", Reason: " + result.getReason() + "]");
 		
 		
 		scanner.nextLine();
 	}
 	
+	/*
 	public static Class<?> loadClass(File file) {
 		Class<?> clazz = null;
 		try {
@@ -78,4 +79,5 @@ public class Program {
 		
 		return clazz;
 	}
+	*/
 }
