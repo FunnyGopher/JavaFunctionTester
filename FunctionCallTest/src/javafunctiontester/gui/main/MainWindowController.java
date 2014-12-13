@@ -34,6 +34,7 @@ public class MainWindowController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		// Initializes the java files list view
 		javaFilesView.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
 
 			@Override
@@ -45,6 +46,8 @@ public class MainWindowController implements Initializable {
                         super.updateItem(t, bln);
                         if (t != null) {
                             setText(t.getName().substring(0, t.getName().length() - 5));
+                        } else {
+                        	setText(null);
                         }
                     }
 				};
