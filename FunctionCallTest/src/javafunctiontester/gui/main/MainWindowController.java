@@ -1,39 +1,63 @@
 package javafunctiontester.gui.main;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 
-public class MainWindowController {
+public class MainWindowController implements Initializable {
 	
 	Parent root;
 	
-	List<File> javaFiles = new ArrayList<File>(); 
-	ObservableList<SimpleStringProperty> javaNames = FXCollections.observableArrayList();
-	ListView<SimpleStringProperty> javaFilesView = new ListView<SimpleStringProperty>();
+	List<File> javaFiles = new ArrayList<File>();
 	
 	@FXML
-	public void openAnswerKeyChooser() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Resource File");
-		fileChooser.getExtensionFilters().addAll(
-		         new ExtensionFilter("Answer Keys", "*.anskey"));
-		List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
+	ListView<File> javaFilesView = new ListView<>();
+	ObservableList<File> observableJavaFiles = FXCollections.observableArrayList(javaFiles);
+	
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		javaFilesView.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
+
+			@Override
+			public ListCell<File> call(ListView<File> param) {
+				ListCell<File> cell = new ListCell<File>() {
+					
+					@Override
+                    protected void updateItem(File t, boolean bln) {
+                        super.updateItem(t, bln);
+                        if (t != null) {
+                            setText(t.getName().substring(0, t.getName().length() - 5));
+                        }
+                    }
+				};
+				
+				return cell;
+			}
+		});
 	}
 	
 	@FXML
 	public void openJavaFileChooser() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Resource File");
+		fileChooser.setTitle("Open J File");
 		fileChooser.getExtensionFilters().addAll(
 		         new ExtensionFilter("Java File", "*.java"));
 		List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
@@ -42,29 +66,42 @@ public class MainWindowController {
 			return;
 		}
 		
-		javaNames.clear();
 		for(File file : files) {
-			if(!javaFiles.contains(file)) {
-				javaFiles.add(file);
-				javaNames.add(new SimpleStringProperty(file.getName()));
-			}
+			addJavaFile(file);
 		}
-		
-		javaFilesView.setItems(javaNames);
 	}
 	
 	private void addJavaFile(File file) {
-		if(!javaFiles.contains(file)) {
-			javaFiles.add(file);
-			javaNames.add(new SimpleStringProperty(file.getName()));
+		if(!observableJavaFiles.contains(file)) {
+			observableJavaFiles.add(file);
 		}
 		
-		javaFilesView.setItems(javaNames);
+		javaFilesView.setItems(observableJavaFiles);
 	}
 	
+	@FXML
+	private void removeJavaFile() {
+		observableJavaFiles.remove(javaFilesView.getSelectionModel().getSelectedIndex());
+	}
 	
+	private File getSelectedJavaFile() {
+		return javaFilesView.getSelectionModel().getSelectedItem();
+	}
+	
+	@FXML
+	public void openAnswerKeyChooser() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Answer Key File");
+		fileChooser.getExtensionFilters().addAll(
+		         new ExtensionFilter("Answer Keys", "*.anskey"));
+		List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
+	}
 	
 	public void setParent(Parent parent) {
 		root = parent;
+	}
+	
+	private void updateJavaFilesView() {
+	    javaFilesView.setItems(observableJavaFiles);
 	}
 }
