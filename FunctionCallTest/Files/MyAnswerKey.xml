@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<answerkey name="Testing Add Function" methodname="add">
+	<data id="expected output" type="int">3</data>
+	<data id="argument" type="int">1</data>
+	<data id="argument" type="int">2</data>
+</answerkey>
