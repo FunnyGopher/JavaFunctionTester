@@ -16,16 +16,18 @@ public class Grader {
 	
 	private List<File> filesToGrade;
 	private List<AnswerKey> answerKeys;
-	private List<Result> results;
+	private List<FileResult> fileResults;
 	
 	public Grader(List<File> filesToGrade, List<AnswerKey> answerKeys) {
 		this.filesToGrade = filesToGrade;
 		this.answerKeys = answerKeys;
-		results = new ArrayList<Result>();
+		fileResults = new ArrayList<FileResult>();
 	}
 	
-	public void grade() {
+	public void grade() {		
 		for(File file : filesToGrade) {
+			List<Result> results = new ArrayList<Result>();
+			
 			for(AnswerKey key : answerKeys) {
 				Result result = new Result(false, key.getName());
 				
@@ -72,9 +74,9 @@ public class Grader {
 					result.setReason(e.getMessage());
 					e.printStackTrace();
 				}
-				
 				results.add(result);
 			}
+			fileResults.add(new FileResult(file, results));
 		}
 	}
 	
@@ -93,7 +95,7 @@ public class Grader {
 		return success;
 	}
 	
-	public List<Result> getResults() {
-		return results;
+	public List<FileResult> getFileResults() {
+		return fileResults;
 	}
 }

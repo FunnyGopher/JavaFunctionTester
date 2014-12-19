@@ -43,4 +43,11 @@ public class Result {
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
+
+	@Override
+	public String toString() {
+		return getAnswerKeyName();
+	}
+	
+	
 }

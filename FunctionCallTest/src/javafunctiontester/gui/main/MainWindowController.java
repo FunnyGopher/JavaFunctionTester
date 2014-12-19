@@ -2,26 +2,25 @@ package javafunctiontester.gui.main;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import javafunctiontester.AnswerKey;
+import javafunctiontester.FileResult;
 import javafunctiontester.Grader;
 import javafunctiontester.Result;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionModel;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
@@ -38,14 +37,23 @@ public class MainWindowController implements Initializable {
 	ListView<AnswerKey> answerKeysView = new ListView<>();
 	ObservableList<AnswerKey> answerKeys = FXCollections.observableArrayList();
 	
+	@FXML
+	ListView<FileResult> fileResultsView = new ListView<>();
+	ObservableList<FileResult> fileResults = FXCollections.observableArrayList();
+	
+	@FXML
+	ListView<Result> akResultsView = new ListView<>();
+	ObservableList<Result> akResults = FXCollections.observableArrayList();
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		initJavaFilesView();
 		initAnswerKeysView();
+		initFileResultsView();
+		initAKResultsView();
 	}
 	
-	@FXML
-	public void openJavaFileChooser() {
+	@FXML public void openJavaFileChooser() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open a Java File");
 		fileChooser.getExtensionFilters().addAll(
@@ -61,6 +69,30 @@ public class MainWindowController implements Initializable {
 		}
 		
 		updateView(javaFilesView, javaFiles);
+	}
+	
+	@FXML public void openAnswerKeyChooser() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open an Answer Key");
+		fileChooser.getExtensionFilters().addAll(
+		         new ExtensionFilter("Answer Key", "*.xml"));
+		List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
+		
+		if(files.isEmpty()) {
+			System.out.println("I'm empty! :D");
+			return;
+		}
+		
+		for(File file : files) {
+			//if(AnswerKey.isValid(file)) {\
+			AnswerKey aKey = AnswerKey.createFromFile(file);
+			addAnswerKey(aKey);
+				// Convert to answerkey object
+				// Add to anskwerKeys
+			//}
+		}
+		
+		updateView(answerKeysView, answerKeys);
 	}
 	
 	private void initJavaFilesView() {
@@ -83,33 +115,7 @@ public class MainWindowController implements Initializable {
 		});
 	}
 	
-	@FXML
-	public void openAnswerKeyChooser() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open an Answer Key");
-		fileChooser.getExtensionFilters().addAll(
-		         new ExtensionFilter("Answer Key", "*.xml"));
-		List<File> files = fileChooser.showOpenMultipleDialog(root.getScene().getWindow());
-		
-		if(files.isEmpty()) {
-			System.out.println("I'm empty! :D");
-			return;
-		}
-		
-		for(File file : files) {
-			//if(AnswerKey.isValid(file)) {\
-			AnswerKey aKey = AnswerKey.createFromFile(file);
-			System.out.println(aKey.getName());
-			addAnswerKey(aKey);
-				// Convert to answerkey object
-				// Add to anskwerKeys
-			//}
-		}
-		
-		updateView(answerKeysView, answerKeys);
-	}
-	
-	private void initAnswerKeysView() {
+	private void initAnswerKeysView() {		
 		answerKeysView.setCellFactory(new Callback<ListView<AnswerKey>, ListCell<AnswerKey>>() {
 			@Override
 			public ListCell<AnswerKey> call(ListView<AnswerKey> param) {
@@ -129,13 +135,88 @@ public class MainWindowController implements Initializable {
 		});
 	}
 	
+	private void initFileResultsView() {
+		fileResultsView.setCellFactory(new Callback<ListView<FileResult>, ListCell<FileResult>>() {
+			@Override
+			public ListCell<FileResult> call(ListView<FileResult> param) {
+				ListCell<FileResult> cell = new ListCell<FileResult>() {
+					@Override
+                    protected void updateItem(FileResult t, boolean bln) {
+                        super.updateItem(t, bln);
+                        Circle circ = new Circle(5);
+                        if (t != null) {
+                        	Color color;
+                        	if(t.getPass()) {
+                        		color = Color.GREEN;
+                        	} else {
+                        		color = Color.RED;
+                        	}
+                        	circ.setFill(color);
+                            setGraphic(circ);
+                            setText(t.getFile().getName().substring(0, t.getFile().getName().length() - 5));
+                        } else {
+                        	setText(null);
+                        }
+                    }
+				};
+				
+				cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						populateAKResults(event);
+					}
+				});
+				return cell;
+			}
+		});
+	}
+	
+	private void initAKResultsView() {
+		akResultsView.setCellFactory(new Callback<ListView<Result>, ListCell<Result>>() {
+			@Override
+			public ListCell<Result> call(ListView<Result> param) {
+				ListCell<Result> cell = new ListCell<Result>() {
+					@Override
+                    protected void updateItem(Result t, boolean bln) {
+                        super.updateItem(t, bln);
+                        Circle circ = new Circle(5);
+                        if (t != null) {
+                        	Color color;
+                        	if(t.didPass()) {
+                        		color = Color.GREEN;
+                        	} else {
+                        		color = Color.RED;
+                        	}
+                        	circ.setFill(color);
+                            setGraphic(circ);
+                            setText(t.getAnswerKeyName());
+                        } else {
+                        	setText(null);
+                        }
+                    }
+				};
+				return cell;
+			}
+		});
+	}
+
+	@FXML private void populateAKResults(MouseEvent event) {
+		FileResult fileResult = (FileResult) getSelection(fileResultsView).getSelectedItem();
+		
+		akResults.clear();
+		for(Result result : fileResult.getResults()) {
+			akResults.add(result);
+		}
+		
+		updateView(akResultsView, akResults);
+	}
+	
 	private void addJavaFile(File file) {
 		if(!javaFiles.contains(file))
 			javaFiles.add(file);
 	}
 	
-	@FXML
-	private void removeJavaFile() {
+	@FXML private void removeJavaFile() {
 		javaFiles.remove(getSelection(javaFilesView).getSelectedItem());
 	}	
 	
@@ -144,8 +225,7 @@ public class MainWindowController implements Initializable {
 			answerKeys.add(answerKey);
 	}
 	
-	@FXML
-	private void removeAnswerKey() {
+	@FXML private void removeAnswerKey() {
 		answerKeys.remove(getSelection(answerKeysView).getSelectedItem());
 	}
 	
@@ -161,13 +241,17 @@ public class MainWindowController implements Initializable {
 		view.setItems(list);
 	}
 	
-	@FXML
-	private void run() {
+	@FXML private void run() {
 		Grader grader = new Grader(javaFiles, answerKeys);
 		grader.grade();
-		List<Result> results = grader.getResults();
+		List<FileResult> results = grader.getFileResults();
 		
-		for(Result result : results)
-			System.out.println("[ Pass: " + result.didPass() + ", Test Name: " + result.getAnswerKeyName() + ", Reason: " + result.getReason() + "]");
+		fileResults.clear();
+		akResults.clear();
+		for(FileResult result : results) {
+			fileResults.add(result);
+		}
+		
+		updateView(fileResultsView, fileResults);
 	}
 }
