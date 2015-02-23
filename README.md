@@ -8,7 +8,5 @@ Java Function Tester reads the output of the functions and compares it against t
 
 ##Contributors
 https://github.com/FunnyGopher
-
 https://github.com/Reline
-
 https://github.com/ThatOneGuyThatName
